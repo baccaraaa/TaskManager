@@ -1,0 +1,22 @@
+# Development and testing dependencies
+-r requirements.txt
+
+# Testing
+pytest==7.4.3
+pytest-asyncio==0.21.1
+pytest-cov==4.1.0
+pytest-xdist==3.3.1
+aiosqlite==0.19.0
+
+# Code quality
+black==23.11.0
+isort==5.12.0
+flake8==6.1.0
+mypy==1.7.1
+
+# Security
+bandit==1.7.5
+safety==2.3.4
+
+# Pre-commit hooks (optional)
+pre-commit==3.6.0
