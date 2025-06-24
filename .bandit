@@ -1,0 +1,25 @@
+[bandit]
+# Bandit configuration file for security analysis
+
+# Test exclusions
+exclude_dirs = [
+    "/tests",
+    "/migrations", 
+    "/alembic",
+    "/.venv",
+    "/venv"
+]
+
+# Skip specific test IDs
+skips = [
+    "B101",  # assert_used - we use asserts in tests
+    "B601",  # paramiko_calls - not using paramiko
+    "B602",  # subprocess_popen_with_shell_equals_true - controlled usage
+]
+
+# Severity levels
+confidence = "MEDIUM"
+severity = "MEDIUM"
+
+# Report format
+format = "json"

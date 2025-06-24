@@ -1,0 +1,98 @@
+# Git
+.git
+.gitignore
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+pip-log.txt
+pip-delete-this-directory.txt
+.tox
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis
+.pytest_cache
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Thumbs.db:encryptable
+
+# Documentation
+README.md
+docs/
+*.md
+
+# Testing and development
+tests/
+.pytest_cache/
+htmlcov/
+.coverage
+coverage.xml
+
+# CI/CD
+.github/
+.travis.yml
+.circleci/
+
+# Logs
+logs/
+*.log
+
+# Temporary files
+tmp/
+temp/
+.tmp/
+
+# Security
+scripts/security_test.py
+bandit-report.json
+safety-report.json
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Backup files
+*.bak
+*.backup
+backup/
+
+# Development tools
+.bandit
+.flake8
+.mypy_cache/
+.isort.cfg
+setup.cfg
+pyproject.toml

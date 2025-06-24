@@ -5,6 +5,12 @@ import time
 import logging
 
 from app.core.config import settings
+from app.core.security_middleware import (
+    SecurityHeadersMiddleware,
+    RateLimitMiddleware,
+    RequestValidationMiddleware,
+    AuditLogMiddleware,
+)
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -33,6 +39,15 @@ app.add_middleware(
     TrustedHostMiddleware,
     allowed_hosts=["localhost", "127.0.0.1", "0.0.0.0"]
 )
+
+# Add security middleware
+app.add_middleware(SecurityHeadersMiddleware)
+app.add_middleware(RequestValidationMiddleware)
+app.add_middleware(AuditLogMiddleware)
+
+# Add rate limiting middleware (only in production)
+if not settings.DEBUG:
+    app.add_middleware(RateLimitMiddleware)
 
 
 # Request timing middleware
