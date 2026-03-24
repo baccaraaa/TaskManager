@@ -1,197 +1,192 @@
-# FastAPI Task Management System
+<p align="center">
+  <h1 align="center">Task Manager API</h1>
+</p>
 
-A comprehensive task management API built with FastAPI, showcasing enterprise-level features and best practices for senior Python developer positions.
+<p align="center">
+  Task management REST API built with <strong>FastAPI</strong>, featuring JWT authentication, real-time WebSocket notifications, background task processing, and a clean layered architecture.
+</p>
 
-## 🚀 Features
+<p align="center">
 
-### Core Functionality
-- **User Authentication & Authorization** (JWT tokens, role-based access)
-- **Task Management** (CRUD operations with advanced filtering)
-- **Project Organization** (Group tasks into projects)
-- **Real-time Updates** (WebSocket notifications)
-- **File Uploads** (Task attachments with cloud storage)
-- **Email Notifications** (Async email sending)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![CI](https://img.shields.io/github/actions/workflow/status/baccaraaa/taskmanager/ci.yml?branch=main)](https://github.com/baccaraaa/taskmanager/actions)
+[![Python](https://img.shields.io/badge/Python-3.10+-3776ab.svg)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.104+-009688.svg)](https://fastapi.tiangolo.com/)
 
-### Technical Excellence
-- **Database Integration** (PostgreSQL with SQLAlchemy ORM)
-- **Async/Await** (Fully asynchronous architecture)
-- **Caching** (Redis for performance optimization)
-- **Background Tasks** (Celery for heavy operations)
-- **API Documentation** (Auto-generated OpenAPI/Swagger)
-- **Testing** (Comprehensive test suite with pytest)
-- **Monitoring** (Logging, metrics, health checks)
-- **Security** (Rate limiting, input validation, CORS)
+</p>
 
-### DevOps & Production Ready
-- **Docker** (Multi-stage builds, docker-compose)
-- **CI/CD** (GitHub Actions workflow)
-- **Environment Configuration** (Pydantic settings)
-- **Database Migrations** (Alembic)
-- **Error Handling** (Structured exception handling)
-- **Code Quality** (Black, isort, flake8, mypy)
+## Features
 
-## 🛠 Tech Stack
+- **JWT authentication** -- access/refresh tokens, role-based access control, password reset flow
+- **Project & task management** -- full CRUD with ownership-based authorization
+- **Advanced task filtering** -- by status, priority, assignee, project, due date, and full-text search
+- **Real-time notifications** -- WebSocket with per-user connection tracking
+- **Background tasks** -- Celery workers for email notifications and scheduled reminders
+- **File attachments** -- upload and download files attached to tasks
+- **Security middleware** -- rate limiting, security headers, request validation, audit logging
+- **Async architecture** -- fully async with SQLAlchemy 2.0 and asyncpg
+- **Comprehensive tests** -- 130+ tests with 80%+ coverage
 
-- **Framework**: FastAPI 0.104+
-- **Database**: PostgreSQL 15+
-- **Cache**: Redis 7+
-- **Message Queue**: Celery with Redis broker
-- **Authentication**: JWT with passlib
-- **ORM**: SQLAlchemy 2.0+
-- **Validation**: Pydantic v2
-- **Testing**: pytest, httpx
-- **Documentation**: Auto-generated OpenAPI
+## Tech Stack
 
-## 📋 Prerequisites
+| Layer | Technology |
+|-------|-----------|
+| Framework | FastAPI 0.104 |
+| Database | PostgreSQL 15 + SQLAlchemy 2.0 (async) |
+| Cache / Broker | Redis 7 |
+| Background Tasks | Celery 5.3 |
+| Authentication | JWT (python-jose) + bcrypt |
+| Validation | Pydantic v2 |
+| Migrations | Alembic |
+| Testing | pytest + pytest-asyncio + httpx |
+| Containerization | Docker (multi-stage) + docker-compose |
+| CI/CD | GitHub Actions |
 
-- Python 3.11+
-- Docker & Docker Compose
-- PostgreSQL (or use Docker)
-- Redis (or use Docker)
+## Quick Start
 
-## 🚀 Quick Start
+Clone and configure:
 
-1. **Clone and Setup**
-   ```bash
-   git clone <repository-url>
-   cd fastapi-task-management
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   pip install -r requirements.txt
-   ```
+```bash
+git clone https://github.com/baccaraaa/taskmanager.git
+cd taskmanager
+cp .env.example .env
+```
 
-2. **Environment Configuration**
-   ```bash
-   cp .env.example .env
-   # Edit .env with your configuration
-   ```
+Run with Docker (recommended):
 
-3. **Run with Docker (Recommended)**
-   ```bash
-   docker-compose up -d
-   ```
+```bash
+docker-compose up -d
+```
 
-4. **Or Run Locally**
-   ```bash
-   # Start database and redis
-   docker-compose up -d postgres redis
-   
-   # Run migrations
-   alembic upgrade head
-   
-   # Start the application
-   uvicorn app.main:app --reload
-   ```
+Or run locally:
 
-5. **Access the Application**
-   - API: http://localhost:8000
-   - Documentation: http://localhost:8000/docs
-   - Alternative docs: http://localhost:8000/redoc
+```bash
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
 
-## 📚 API Endpoints
+# Start PostgreSQL and Redis
+docker-compose up -d postgres redis
+
+# Run migrations
+alembic upgrade head
+
+# Start the app
+uvicorn app.main:app --reload
+```
+
+Open the API docs at [http://localhost:8000/docs](http://localhost:8000/docs).
+
+## Project Structure
+
+```
+app/
+  api/
+    api_v1/endpoints/   -- route handlers (auth, users, projects, tasks, websocket)
+    deps.py             -- dependency injection (auth, DB sessions)
+  core/                 -- config, security, middleware, exceptions
+  crud/                 -- database operations (user, project, task)
+  db/                   -- SQLAlchemy models and connection
+  schemas/              -- Pydantic request/response models
+  services/             -- business logic and authorization
+  workers/              -- Celery tasks (email, reminders)
+  utils/                -- email rendering
+tests/                  -- 130+ async tests
+```
+
+## API Overview
 
 ### Authentication
-- `POST /auth/register` - Register new user
-- `POST /auth/login` - Login user
-- `POST /auth/refresh` - Refresh access token
-- `POST /auth/logout` - Logout user
 
-### Users
-- `GET /users/me` - Get current user profile
-- `PUT /users/me` - Update user profile
-- `GET /users/{user_id}` - Get user by ID (admin only)
+```bash
+# Register
+curl -X POST http://localhost:8000/api/v1/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"email": "user@example.com", "username": "user", "password": "securepass123"}'
+
+# Login
+curl -X POST http://localhost:8000/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username": "user", "password": "securepass123"}'
+# Returns: { "access_token": "...", "refresh_token": "...", "token_type": "bearer" }
+```
 
 ### Projects
-- `GET /projects/` - List user projects
-- `POST /projects/` - Create new project
-- `GET /projects/{project_id}` - Get project details
-- `PUT /projects/{project_id}` - Update project
-- `DELETE /projects/{project_id}` - Delete project
+
+```bash
+# Create a project
+curl -X POST http://localhost:8000/api/v1/projects/ \
+  -H "Authorization: Bearer <token>" \
+  -H "Content-Type: application/json" \
+  -d '{"name": "My Project", "description": "Project description"}'
+```
 
 ### Tasks
-- `GET /tasks/` - List tasks with filtering/pagination
-- `POST /tasks/` - Create new task
-- `GET /tasks/{task_id}` - Get task details
-- `PUT /tasks/{task_id}` - Update task
-- `DELETE /tasks/{task_id}` - Delete task
-- `POST /tasks/{task_id}/attachments` - Upload task attachment
+
+```bash
+# Create a task
+curl -X POST http://localhost:8000/api/v1/tasks/ \
+  -H "Authorization: Bearer <token>" \
+  -H "Content-Type: application/json" \
+  -d '{"title": "Fix login bug", "priority": "high", "project_id": 1}'
+
+# Filter tasks
+curl "http://localhost:8000/api/v1/tasks/?status=todo&priority=high&search=bug" \
+  -H "Authorization: Bearer <token>"
+```
 
 ### WebSocket
-- `WS /ws/{user_id}` - Real-time notifications
 
-## 🧪 Testing
+```javascript
+const ws = new WebSocket("ws://localhost:8000/api/v1/ws/1?token=<access_token>");
+ws.onmessage = (event) => {
+  const data = JSON.parse(event.data);
+  console.log(data); // { event: "task_status_changed", task_id: 1, ... }
+};
+```
+
+## API Endpoints
+
+| Method | Path | Description |
+|--------|------|-------------|
+| POST | `/auth/register` | Register new user |
+| POST | `/auth/login` | Login, returns JWT tokens |
+| POST | `/auth/refresh` | Refresh access token |
+| POST | `/auth/password-reset` | Request password reset |
+| POST | `/auth/password-reset/confirm` | Confirm password reset |
+| GET | `/users/me` | Current user profile |
+| PUT | `/users/me` | Update profile |
+| GET | `/users/` | List users (admin) |
+| GET | `/users/{id}` | Get user (admin) |
+| GET | `/projects/` | List own projects |
+| POST | `/projects/` | Create project |
+| GET | `/projects/{id}` | Get project |
+| PUT | `/projects/{id}` | Update project |
+| DELETE | `/projects/{id}` | Delete project |
+| GET | `/tasks/` | List tasks (with filters) |
+| POST | `/tasks/` | Create task |
+| GET | `/tasks/{id}` | Get task |
+| PUT | `/tasks/{id}` | Update task |
+| DELETE | `/tasks/{id}` | Delete task |
+| POST | `/tasks/{id}/attachments` | Upload attachment |
+| GET | `/tasks/{id}/attachments/{att_id}` | Download attachment |
+| WS | `/ws/{user_id}` | Real-time notifications |
+
+All endpoints prefixed with `/api/v1`.
+
+## Testing
 
 ```bash
 # Run all tests
 pytest
 
 # Run with coverage
-pytest --cov=app --cov-report=html
+pytest --cov=app --cov-report=term-missing
 
-# Run specific test file
-pytest tests/test_tasks.py
-
-# Run tests in parallel
-pytest -n auto
+# Run specific module
+pytest tests/test_tasks.py -v
 ```
 
-## 🏗 Architecture
+## License
 
-```
-app/
-├── api/                 # API routes
-├── core/               # Core functionality (auth, config, security)
-├── crud/               # Database operations
-├── db/                 # Database models and connection
-├── schemas/            # Pydantic models
-├── services/           # Business logic
-├── utils/              # Utility functions
-├── workers/            # Background tasks
-└── main.py            # Application entry point
-```
-
-## 🔒 Security Features
-
-- JWT token authentication
-- Password hashing with bcrypt
-- Rate limiting
-- CORS configuration
-- Input validation and sanitization
-- SQL injection prevention
-- XSS protection
-
-## 📈 Performance Optimizations
-
-- Database query optimization
-- Redis caching
-- Async database operations
-- Connection pooling
-- Background task processing
-- Response compression
-
-## 🚀 Deployment
-
-The application is production-ready with:
-- Docker multi-stage builds
-- Health check endpoints
-- Graceful shutdown handling
-- Environment-based configuration
-- Logging and monitoring
-- Database migration management
-
-## 📄 License
-
-MIT License - see LICENSE file for details.
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests
-5. Run the test suite
-6. Submit a pull request
-
----
-
-This project demonstrates advanced FastAPI development skills suitable for senior Python developer positions, including modern async patterns, comprehensive testing, security best practices, and production deployment considerations.
+[MIT](LICENSE)
