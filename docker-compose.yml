@@ -4,10 +4,12 @@ services:
   postgres:
     image: postgres:15
     container_name: taskmanager_postgres
+    env_file:
+      - .env
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: taskmanager
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      POSTGRES_DB: ${POSTGRES_DB:-taskmanager}
     ports:
       - "5432:5432"
     volumes:
@@ -38,11 +40,12 @@ services:
     container_name: taskmanager_app
     ports:
       - "8000:8000"
+    env_file:
+      - .env
     environment:
-      - DATABASE_URL=postgresql+asyncpg://postgres:password@postgres:5432/taskmanager
-      - DATABASE_URL_SYNC=postgresql://postgres:password@postgres:5432/taskmanager
+      - DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-password}@postgres:5432/${POSTGRES_DB:-taskmanager}
+      - DATABASE_URL_SYNC=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-password}@postgres:5432/${POSTGRES_DB:-taskmanager}
       - REDIS_URL=redis://redis:6379/0
-      - SECRET_KEY=your-super-secret-key-change-this-in-production
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
     depends_on:
@@ -59,11 +62,12 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: taskmanager_celery
+    env_file:
+      - .env
     environment:
-      - DATABASE_URL=postgresql+asyncpg://postgres:password@postgres:5432/taskmanager
-      - DATABASE_URL_SYNC=postgresql://postgres:password@postgres:5432/taskmanager
+      - DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-password}@postgres:5432/${POSTGRES_DB:-taskmanager}
+      - DATABASE_URL_SYNC=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-password}@postgres:5432/${POSTGRES_DB:-taskmanager}
       - REDIS_URL=redis://redis:6379/0
-      - SECRET_KEY=your-super-secret-key-change-this-in-production
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
     depends_on:

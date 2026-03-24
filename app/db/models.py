@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 from typing import Optional
 
@@ -40,12 +40,12 @@ class User(Base):
     is_active = Column(Boolean, default=True)
     is_verified = Column(Boolean, default=False)
     role = Column(SQLEnum(UserRole), default=UserRole.USER)
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 
     # Relationships
     projects = relationship("Project", back_populates="owner", cascade="all, delete-orphan")
-    tasks = relationship("Task", back_populates="assignee")
+    tasks = relationship("Task", foreign_keys="Task.assignee_id", back_populates="assignee")
     created_tasks = relationship("Task", foreign_keys="Task.created_by_id", back_populates="created_by")
 
 
@@ -56,8 +56,8 @@ class Project(Base):
     name = Column(String, nullable=False)
     description = Column(Text, nullable=True)
     is_active = Column(Boolean, default=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
     
     # Foreign Keys
     owner_id = Column(Integer, ForeignKey("users.id"), nullable=False)
@@ -77,8 +77,8 @@ class Task(Base):
     priority = Column(SQLEnum(TaskPriority), default=TaskPriority.MEDIUM)
     due_date = Column(DateTime, nullable=True)
     completed_at = Column(DateTime, nullable=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
     
     # Foreign Keys
     project_id = Column(Integer, ForeignKey("projects.id"), nullable=False)
@@ -101,7 +101,7 @@ class TaskAttachment(Base):
     file_path = Column(String, nullable=False)
     file_size = Column(Integer, nullable=False)
     content_type = Column(String, nullable=False)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
     
     # Foreign Key
     task_id = Column(Integer, ForeignKey("tasks.id"), nullable=False)

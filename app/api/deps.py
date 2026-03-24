@@ -6,7 +6,7 @@ from sqlalchemy import select
 
 from app.core.security import verify_token
 from app.db.database import get_async_session
-from app.db.models import User
+from app.db.models import User, UserRole
 from app.schemas.auth import TokenData
 
 
@@ -67,7 +67,7 @@ async def get_current_admin_user(
     current_user: User = Depends(get_current_user),
 ) -> User:
     """Get current admin user."""
-    if current_user.role != "admin":
+    if current_user.role != UserRole.ADMIN:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Not enough permissions"

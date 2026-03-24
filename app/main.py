@@ -1,3 +1,5 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
@@ -16,6 +18,16 @@ from app.core.security_middleware import (
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    logger.info(f"Starting {settings.PROJECT_NAME}")
+    logger.info(f"Environment: {settings.ENVIRONMENT}")
+    logger.info(f"Debug mode: {settings.DEBUG}")
+    yield
+    logger.info(f"Shutting down {settings.PROJECT_NAME}")
+
+
 # Create FastAPI instance
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -23,6 +35,7 @@ app = FastAPI(
     version="1.0.0",
     docs_url="/docs",
     redoc_url="/redoc",
+    lifespan=lifespan,
 )
 
 # Add CORS middleware
@@ -83,21 +96,13 @@ async def root():
     }
 
 
-# Include API routers (we'll add these later)
-# from app.api.api_v1.api import api_router
-# app.include_router(api_router, prefix=settings.API_V1_STR)
+# Register custom exception handlers
+from app.core.exceptions import register_exception_handlers
+register_exception_handlers(app)
 
-
-@app.on_event("startup")
-async def startup_event():
-    logger.info(f"Starting {settings.PROJECT_NAME}")
-    logger.info(f"Environment: {settings.ENVIRONMENT}")
-    logger.info(f"Debug mode: {settings.DEBUG}")
-
-
-@app.on_event("shutdown")
-async def shutdown_event():
-    logger.info(f"Shutting down {settings.PROJECT_NAME}")
+# Include API routers
+from app.api.api_v1.api import api_router
+app.include_router(api_router, prefix=settings.API_V1_STR)
 
 
 if __name__ == "__main__":

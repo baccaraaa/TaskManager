@@ -1,3 +1,4 @@
+import logging
 import time
 from typing import Dict, Optional
 from fastapi import Request, Response, HTTPException, status
@@ -5,6 +6,8 @@ from fastapi.security.utils import get_authorization_scheme_param
 from starlette.middleware.base import BaseHTTPMiddleware
 import redis.asyncio as redis
 from app.core.config import settings
+
+logger = logging.getLogger(__name__)
 
 
 class RateLimitMiddleware(BaseHTTPMiddleware):
@@ -74,7 +77,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
             raise
         except Exception as e:
             # If Redis is down, log error but don't block requests
-            print(f"Rate limiting error: {e}")
+            logger.warning(f"Rate limiting error: {e}")
             return await call_next(request)
     
     def get_client_ip(self, request: Request) -> str:
@@ -255,7 +258,7 @@ class AuditLogMiddleware(BaseHTTPMiddleware):
         
         # Log to console (replace with proper logging)
         if response.status_code >= 400:
-            print(f"SECURITY LOG: {log_data}")
+            logger.warning(f"Security audit: {log_data}")
         
         return response
     
